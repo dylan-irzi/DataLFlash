@@ -14,3 +14,5 @@ verify_core.py
 verify_demo.py
 main.ipynb
 Testing.ipynb
+.gitignore 
+publish-to-pypi.yml
