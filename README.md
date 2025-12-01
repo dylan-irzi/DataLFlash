@@ -11,6 +11,17 @@
 
 DataLFlash is an optimized library for training Deep Learning models. It is designed to handle both massive datasets that don't fit in RAM and standard datasets with maximum efficiency.
 
+### 📦 Installation
+
+```bash
+# Install from GitHub
+pip install git+https://github.com/dylan-irzi/DataLFlash.git
+
+# Or install locally (for development)
+git clone https://github.com/dylan-irzi/DataLFlash.git
+pip install -e .
+```
+
 ### ⚡ Why DataLFlash?
 - **Up to 60% Faster Training**: Optimizes the entire data loading pipeline, reducing overhead and CPU bottlenecks.
 - **7.6x Speedup for In-Memory Data**: Uses zero-copy vectorization to bypass standard PyTorch DataLoader limitations.
@@ -117,6 +128,18 @@ for batch in train_loader:
 ## 🇪🇸 Español
 
 DataLFlash es una librería optimizada para el entrenamiento de modelos de Deep Learning. Está diseñada para manejar tanto datasets masivos que no caben en RAM como datasets estándar con la máxima eficiencia.
+
+### 📦 Instalación
+
+```bash
+# Instalar desde GitHub
+pip install git+https://github.com/dylan-irzi/DataLFlash.git
+
+# O instalar localmente (para desarrollo)
+git clone https://github.com/dylan-irzi/DataLFlash.git
+cd DataLFlash
+pip install -e .
+```
 
 ### ⚡ ¿Por qué DataLFlash?
 - **Hasta 60% más rápido**: Optimiza todo el pipeline de carga de datos, reduciendo el overhead y cuellos de botella en CPU.
