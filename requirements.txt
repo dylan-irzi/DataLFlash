@@ -1,0 +1,8 @@
+torch>=1.12.0
+numpy>=1.21.0
+tqdm>=4.64.0
+psutil>=5.9.0
+pyarrow>=8.0.0
+zarr>=2.13.0
+dask>=2022.10.0
+torchdata>=0.7.0 
