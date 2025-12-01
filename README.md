@@ -14,6 +14,12 @@ DataLFlash is an optimized library for training Deep Learning models. It is desi
 ### 📦 Installation
 
 ```bash
+# Install from PyPI
+pip install datalflash
+
+# View package information
+pip show datalflash
+
 # Install from GitHub
 pip install git+https://github.com/dylan-irzi/DataLFlash.git
 
@@ -132,6 +138,12 @@ DataLFlash es una librería optimizada para el entrenamiento de modelos de Deep 
 ### 📦 Instalación
 
 ```bash
+# Instalar desde PyPI
+pip install datalflash
+
+# Ver información del paquete
+pip show datalflash
+
 # Instalar desde GitHub
 pip install git+https://github.com/dylan-irzi/DataLFlash.git
 
@@ -263,3 +275,9 @@ for batch in train_loader:
 | `sampler` | `sampler` | `None` | Custom sampler / Muestreo personalizado |
 | `collate_fn` | `collate_fn` | `default` | Merge samples / Unir muestras |
 | `drop_last` | `drop_last` | `False` | Drop incomplete batch / Descartar último batch |
+
+## 📄 License / Licencia
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+Este proyecto está bajo la Licencia MIT - mira el archivo [LICENSE](LICENSE) para más detalles.
