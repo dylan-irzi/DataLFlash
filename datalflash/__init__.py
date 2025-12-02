@@ -5,7 +5,7 @@ from .utils import DatasetConverter
 from .chunked_dataset import ChunkedFlashDataset
 from . import augmentation
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __all__ = [
     'FlashDataset',
     'FlashDataLoader', 

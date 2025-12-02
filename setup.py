@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="datalflash",
-    version="0.1.0",
+    version="0.1.1",
     author="Juan Castro",
     author_email="dylan.irzi@gmail.com",
     description="High-performance data loaders for PyTorch inspired by flashtensors",
