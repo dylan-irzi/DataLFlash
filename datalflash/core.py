@@ -60,19 +60,21 @@ class FlashDataset:
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-            
+
         if isinstance(idx, list) or isinstance(idx, np.ndarray):
-            # slicing contiguo con torch.index_select (más rápido que advanced indexing)
             idx_tensor = torch.as_tensor(idx, dtype=torch.long)
             feature = torch.index_select(self.features, 0, idx_tensor)
+            target = None
+            if self.targets is not None:
+                target = torch.index_select(self.targets, 0, idx_tensor)
         else:
             feature = self.features[idx]
-        
+            target = self.targets[idx] if self.targets is not None else None
+
         if self.memory_optimized and isinstance(feature, torch.Tensor) and feature.dtype == torch.float16:
             feature = feature.float()
-            
-        if self.targets is not None:
-            target = self.targets[idx]
+
+        if target is not None:
             return feature, target
         return feature
 
@@ -242,7 +244,7 @@ class FlashDataLoader:
             return
 
         # prefetch first batch
-        next_batch = self.dataset[next_indices]
+        next_batch = self._process_batch(self.dataset[next_indices])
         
         # Container for thread result
         prefetch_result = [None]
@@ -250,7 +252,7 @@ class FlashDataLoader:
         for batch_indices in it:
             # lanza prefetch del batch siguiente
             def prefetch_task():
-                prefetch_result[0] = self.dataset[batch_indices]
+                prefetch_result[0] = self._process_batch(self.dataset[batch_indices])
 
             thread = threading.Thread(
                 target=prefetch_task,
@@ -258,14 +260,14 @@ class FlashDataLoader:
             )
             thread.start()
 
-            yield self._process_batch(next_batch)
+            yield next_batch
 
             # espera al prefetch
             thread.join()
             next_batch = prefetch_result[0]
 
         # último batch
-        yield self._process_batch(next_batch)
+        yield next_batch
 
     def __iter__(self):
         if self.is_chunked:
