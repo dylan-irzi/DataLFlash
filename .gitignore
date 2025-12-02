@@ -15,3 +15,4 @@ verify_demo.py
 main.ipynb
 Testing.ipynb
 test_optimizations.py
+test_optimizations_critical.py
