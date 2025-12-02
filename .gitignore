@@ -14,3 +14,4 @@ verify_core.py
 verify_demo.py
 main.ipynb
 Testing.ipynb
+test_optimizations.py

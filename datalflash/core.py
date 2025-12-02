@@ -49,6 +49,11 @@ class FlashDataset:
             if isinstance(self.features, torch.Tensor) and self.features.dtype == torch.float32:
                 self.features = self.features.half()
             
+            if self.features.device.type == "cpu":
+                self.features = self.features.pin_memory()
+                if self.targets is not None:
+                    self.targets = self.targets.pin_memory()
+            
     def __len__(self):
         return len(self.features)
     
@@ -56,7 +61,12 @@ class FlashDataset:
         if torch.is_tensor(idx):
             idx = idx.tolist()
             
-        feature = self.features[idx]
+        if isinstance(idx, list) or isinstance(idx, np.ndarray):
+            # slicing contiguo con torch.index_select (más rápido que advanced indexing)
+            idx_tensor = torch.as_tensor(idx, dtype=torch.long)
+            feature = torch.index_select(self.features, 0, idx_tensor)
+        else:
+            feature = self.features[idx]
         
         if self.memory_optimized and isinstance(feature, torch.Tensor) and feature.dtype == torch.float16:
             feature = feature.float()
@@ -224,20 +234,48 @@ class FlashDataLoader:
             return features, targets
         return features
 
+    def _prefetch_vectorized_iter(self):
+        it = iter(self.batch_sampler)
+        next_indices = next(it, None)
+
+        if next_indices is None:
+            return
+
+        # prefetch first batch
+        next_batch = self.dataset[next_indices]
+        
+        # Container for thread result
+        prefetch_result = [None]
+
+        for batch_indices in it:
+            # lanza prefetch del batch siguiente
+            def prefetch_task():
+                prefetch_result[0] = self.dataset[batch_indices]
+
+            thread = threading.Thread(
+                target=prefetch_task,
+                daemon=True
+            )
+            thread.start()
+
+            yield self._process_batch(next_batch)
+
+            # espera al prefetch
+            thread.join()
+            next_batch = prefetch_result[0]
+
+        # último batch
+        yield self._process_batch(next_batch)
+
     def __iter__(self):
         if self.is_chunked:
             return self._chunked_iter()
-        elif isinstance(self.dataset, FlashDataset) and self.num_workers == 0 and self.collate_fn == default_collate:
-            return self._vectorized_iter()
+        elif self.num_workers == 0 and self.collate_fn == default_collate:
+            return self._prefetch_vectorized_iter()
         elif self.num_workers > 0:
             return self._multi_worker_iter()
         else:
             return self._single_thread_iter()
-
-    def _vectorized_iter(self):
-        for batch_indices in self.batch_sampler:
-            batch = self.dataset[batch_indices]
-            yield self._process_batch(batch)
 
     def _single_thread_iter(self):
         for batch_indices in self.batch_sampler:
